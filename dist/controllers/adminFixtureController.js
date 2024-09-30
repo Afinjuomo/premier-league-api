@@ -55,9 +55,9 @@ exports.createFixture = createFixture;
 // Update a fixture (Admin)
 const updateFixture = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const { homeTeam, awayTeam, date } = req.body;
+    const { date } = req.body;
     try {
-        const updatedFixture = yield fixtureModel_1.default.findByIdAndUpdate(id, { homeTeam, awayTeam, date }, { new: true });
+        const updatedFixture = yield fixtureModel_1.default.findByIdAndUpdate(id, { date }, { new: true });
         if (!updatedFixture) {
             res.status(404).json({ message: 'Fixture not found' });
             return;

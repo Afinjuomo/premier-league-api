@@ -49,12 +49,12 @@ export const createFixture = async (req: Request, res: Response): Promise<void> 
 // Update a fixture (Admin)
 export const updateFixture = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
-    const { homeTeam, awayTeam, date } = req.body;
+    const { date } = req.body;
 
     try {
         const updatedFixture = await Fixture.findByIdAndUpdate(
             id,
-            { homeTeam, awayTeam, date },
+            { date },
             { new: true }
         );
 
