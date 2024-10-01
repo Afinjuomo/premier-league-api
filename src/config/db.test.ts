@@ -3,21 +3,18 @@ import mongoose from 'mongoose';
 let testConnection: mongoose.Connection | null = null;
 
 // Use environment variable for the MongoDB connection string
-const connectionString = process.env.TEST_MONGODB_URI || 
-    'mongodb://localhost:27017/test-database';
+const connectionString = process.env.TEST_MONGODB_URI || 'mongodb://localhost:27017/test-database';
 
 // Function to connect to the test database
-export const connectTestDB = async () => {
+export const connectTestDB = async (): Promise<mongoose.Connection | null> => {
     if (testConnection && testConnection.readyState === 1) {
         console.log('Already connected to the test database');
         return testConnection;
     }
 
     try {
-        testConnection = await mongoose.createConnection(connectionString, {
-       
-          
-        });
+        // Create connection to the test database
+        testConnection = await mongoose.createConnection(connectionString);
 
         // Event listeners for connection status
         testConnection.on('connected', () => {
@@ -37,7 +34,7 @@ export const connectTestDB = async () => {
 };
 
 // Function to close the test database connection
-export const closeTestDB = async () => {
+export const closeTestDB = async (): Promise<void> => {
     if (testConnection) {
         await testConnection.close();
         console.log('Test MongoDB connection closed');

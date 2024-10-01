@@ -16,8 +16,7 @@ exports.closeTestDB = exports.connectTestDB = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 let testConnection = null;
 // Use environment variable for the MongoDB connection string
-const connectionString = process.env.TEST_MONGODB_URI ||
-    'mongodb://localhost:27017/test-database';
+const connectionString = process.env.TEST_MONGODB_URI || 'mongodb://localhost:27017/test-database';
 // Function to connect to the test database
 const connectTestDB = () => __awaiter(void 0, void 0, void 0, function* () {
     if (testConnection && testConnection.readyState === 1) {
@@ -25,7 +24,8 @@ const connectTestDB = () => __awaiter(void 0, void 0, void 0, function* () {
         return testConnection;
     }
     try {
-        testConnection = yield mongoose_1.default.createConnection(connectionString, {});
+        // Create connection to the test database
+        testConnection = yield mongoose_1.default.createConnection(connectionString);
         // Event listeners for connection status
         testConnection.on('connected', () => {
             console.log('Test MongoDB connected successfully');

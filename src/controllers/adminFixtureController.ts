@@ -96,9 +96,18 @@ export const getAllFixtures = async (req: Request, res: Response): Promise<void>
     try {
         const fixtures = await Fixture.find();
         console.log('Retrieved fixtures:', fixtures);
+        
+        // Check if no fixtures were found
+        if (fixtures.length === 0) {
+            res.status(404).json({ message: 'No fixtures found.' });
+            return;
+        }
+
+        // Return the found fixtures
         res.status(200).json(fixtures);
     } catch (error) {
         console.error('Error fetching fixtures:', error);
         res.status(500).json({ message: 'Error fetching fixtures', error });
     }
 };
+

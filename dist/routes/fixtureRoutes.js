@@ -17,9 +17,9 @@ router.use(rateLimitingMiddleware_1.rateLimiter);
 // Create a fixture (Admin) - Protected route, only accessible by 'admin' role
 router.post('/create', (0, authMiddleware_1.authMiddleware)('admin'), validationMiddleware_1.validateFixture, adminFixtureController_1.createFixture);
 // Update a fixture (Admin) - Protected route, only accessible by 'admin' role
-router.put('/fixture/:id', (0, authMiddleware_1.authMiddleware)('admin'), validationMiddleware_1.validateFixture, adminFixtureController_1.updateFixture);
+router.put('/update/:id', (0, authMiddleware_1.authMiddleware)('admin'), validationMiddleware_1.validateFixture, adminFixtureController_1.updateFixture);
 // Delete a fixture (Admin) - Protected route, only accessible by 'admin' role
-router.delete('/fixture/:id', (0, authMiddleware_1.authMiddleware)('admin'), adminFixtureController_1.deleteFixture);
+router.delete('/delete/:id', (0, authMiddleware_1.authMiddleware)('admin'), adminFixtureController_1.deleteFixture);
 // Get all fixtures (Admin) - Protected route, only accessible by 'admin' role
-router.get('/fixtures', (0, authMiddleware_1.authMiddleware)('admin'), adminFixtureController_1.getAllFixtures);
+router.get('/get-fixtures', (0, authMiddleware_1.authMiddleware)('admin'), adminFixtureController_1.getAllFixtures);
 exports.default = router;

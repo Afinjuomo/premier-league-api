@@ -94,6 +94,12 @@ const getAllFixtures = (req, res) => __awaiter(void 0, void 0, void 0, function*
     try {
         const fixtures = yield fixtureModel_1.default.find();
         console.log('Retrieved fixtures:', fixtures);
+        // Check if no fixtures were found
+        if (fixtures.length === 0) {
+            res.status(404).json({ message: 'No fixtures found.' });
+            return;
+        }
+        // Return the found fixtures
         res.status(200).json(fixtures);
     }
     catch (error) {

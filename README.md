@@ -2,7 +2,7 @@
 
 Create an API that serves the latest scores of fixtures of matches in a “**Mock Premier League**”
 
-postman documentation  https://documenter.getpostman.com/view/27253077/2sAXxJgZmx#60ec7e37-8387-4ab2-a62c-6c1799f4fc44
+postman documentation https://documenter.getpostman.com/view/27253077/2sAXxJgZmx
 ## User Types
 
 There should be:

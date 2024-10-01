@@ -47,7 +47,7 @@ app.use(rateLimitingMiddleware_1.rateLimiter);
 // Admin routes (protected with admin auth)
 app.use('/admin/teams', (0, authMiddleware_1.authMiddleware)('admin'), teamRoute_1.default);
 app.use('/admin/fixtures', (0, authMiddleware_1.authMiddleware)('admin'), fixtureRoutes_1.default);
-// User routes (protected with user auth)
+// User routes 
 app.use('/users', userRoute_1.default);
 // Export the app for use in testing or other modules
 exports.default = app;

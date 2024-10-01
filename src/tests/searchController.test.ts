@@ -1,25 +1,41 @@
+import dotenv from 'dotenv'; // Load environment variables
 import request from 'supertest';
-import app from '../app'; // Import your Express app
-import connectDB from '../config/db'; // Import your DB connection function
-import Team from '../models/teamModel';
+import app from '../app'; // Your Express app
+import jwt from 'jsonwebtoken';
 import Fixture from '../models/fixtureModel';
+import Team from '../models/teamModel';
+import { connectTestDB, closeTestDB } from '../config/db.test'; // DB connection
+
+// Load environment variables from .env.test file
+dotenv.config({ path: '.env.test' });
+
+// Create a fake JWT token for testing
+const fakeToken = jwt.sign({ id: 'testId', role: 'user' }, process.env.JWT_SECRET!, { expiresIn: '1h' });
 
 beforeAll(async () => {
-    await connectDB(); // Connect to the test database
+    await connectTestDB(); // Connect to the test database
 });
 
 afterAll(async () => {
-    await Team.deleteMany({}); // Clean up the test data
+    // Clean up the database and close connection after all tests
+    await Team.deleteMany({});
     await Fixture.deleteMany({});
+    await closeTestDB(); // Close test database connection instead of mongoose.connection.close()
 });
 
-describe('GET /search', () => {
+describe('Search Controller', () => {
     beforeEach(async () => {
         // Set up test data
         const team1 = await Team.create({ name: 'Lions', city: 'Nairobi', stadium: 'Nairobi Stadium' });
         const team2 = await Team.create({ name: 'Tigers', city: 'Kampala', stadium: 'Kampala Stadium' });
-        
-        await Fixture.create({ homeTeam: team1._id, awayTeam: team2._id, date: new Date() });
+
+        const futureDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        await Fixture.create({
+            homeTeam: team1._id,
+            awayTeam: team2._id,
+            date: futureDate,
+            link: 'unique-link-123',
+        });
     });
 
     afterEach(async () => {
@@ -30,7 +46,8 @@ describe('GET /search', () => {
 
     it('should return 200 and list teams and fixtures when a valid query is provided', async () => {
         const response = await request(app)
-            .get('/search')
+            .get('/users/search')
+            .set('Authorization', `Bearer ${fakeToken}`) // Add Authorization header
             .query({ query: 'Lions' });
 
         expect(response.status).toBe(200);
@@ -41,37 +58,43 @@ describe('GET /search', () => {
 
     it('should return 404 when no teams or fixtures are found', async () => {
         const response = await request(app)
-            .get('/search')
-            .query({ query: 'Bears' }); // Query that doesn't match any team
+            .get('/users/search')
+            .set('Authorization', `Bearer ${fakeToken}`) // Add Authorization header
+            .query({ query: 'Bears' });
 
         expect(response.status).toBe(404);
         expect(response.body.message).toBe('No teams or fixtures found.');
     });
 
     it('should return 400 when the query parameter is missing', async () => {
-        const response = await request(app).get('/search');
+        const response = await request(app)
+            .get('/users/search')
+            .set('Authorization', `Bearer ${fakeToken}`) // Add Authorization header
+            .query({}); // No query
 
         expect(response.status).toBe(400);
-        expect(response.body.message).toBe('Query parameter is required and must be a string.');
+        expect(response.body.message).toBe('Query parameter is required and must be a non-empty string.');
     });
 
     it('should return 400 when the query parameter is not a string', async () => {
         const response = await request(app)
-            .get('/search')
-            .query({ query: 123 }); // Invalid query type
+            .get('/users/search')
+            .set('Authorization', `Bearer ${fakeToken}`) // Add Authorization header
+            .query({ query: 123 }); // Non-string query
 
-        expect(response.status).toBe(400);
-        expect(response.body.message).toBe('Query parameter is required and must be a string.');
+        expect(response.status).toBe(400); // Expecting 400
+        expect(response.body.message).toBe('Query parameter is required and must be a non-empty string.'); // Expecting the correct message
     });
 
     it('should return 500 on server error', async () => {
-        // Mock a server error
+        // Simulate a server error by mocking the Fixture.find method
         jest.spyOn(Fixture, 'find').mockImplementationOnce(() => {
             throw new Error('Database error');
         });
 
         const response = await request(app)
-            .get('/search')
+            .get('/users/search')
+            .set('Authorization', `Bearer ${fakeToken}`) // Add Authorization header
             .query({ query: 'Lions' });
 
         expect(response.status).toBe(500);

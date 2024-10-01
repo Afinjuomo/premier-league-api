@@ -17,12 +17,12 @@ router.use(rateLimiter);
 router.post('/create', authMiddleware('admin'), validateFixture, createFixture);
 
 // Update a fixture (Admin) - Protected route, only accessible by 'admin' role
-router.put('/fixture/:id', authMiddleware('admin'), validateFixture, updateFixture);
+router.put('/update/:id', authMiddleware('admin'), validateFixture, updateFixture);
 
 // Delete a fixture (Admin) - Protected route, only accessible by 'admin' role
-router.delete('/fixture/:id', authMiddleware('admin'), deleteFixture);
+router.delete('/delete/:id', authMiddleware('admin'), deleteFixture);
 
 // Get all fixtures (Admin) - Protected route, only accessible by 'admin' role
-router.get('/fixtures', authMiddleware('admin'), getAllFixtures);
+router.get('/get-fixtures', authMiddleware('admin'), getAllFixtures);
 
 export default router;

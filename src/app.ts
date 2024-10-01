@@ -54,7 +54,7 @@ connectDB();
 app.use('/admin/teams', authMiddleware('admin'), teamRoutes); 
 app.use('/admin/fixtures', authMiddleware('admin'), fixtureRoutes); 
 
-// User routes (protected with user auth)
+// User routes 
 app.use('/users', userRoutes);
 
 // Export the app for use in testing or other modules

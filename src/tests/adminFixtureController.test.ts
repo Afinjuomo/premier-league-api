@@ -8,28 +8,30 @@ import Team from '../models/teamModel';
 import { connectTestDB } from '../config/db.test'; 
 
 // Load environment variables from .env.test file
-dotenv.config({ path: '.env.test' }); 
+dotenv.config({ path: '.env.test' });
 
 // Create a fake JWT token for testing
 const fakeToken = jwt.sign({ id: 'testId', role: 'admin' }, process.env.JWT_SECRET!, { expiresIn: '1h' });
-
+let teamId1: mongoose.Types.ObjectId;
+let teamId2: mongoose.Types.ObjectId;
 beforeAll(async () => {
     // Connect to the test MongoDB before all tests
     await connectTestDB(); 
 });
 
 describe('Admin Fixture Controller', () => {
-    let teamId1: mongoose.Types.ObjectId;
-    let teamId2: mongoose.Types.ObjectId;
+    
 
     beforeEach(async () => {
         // Clean up the database before each test
         await Fixture.deleteMany();
         await Team.deleteMany();
 
+       
+
         // Create teams for testing
-        const team1 = new Team({ name: 'Team A', city: 'City A', stadium: 'Stadium A' });
-        const team2 = new Team({ name: 'Team B', city: 'City B', stadium: 'Stadium B' });
+        const team1 = new Team({ name: 'Team C', city: 'City C', stadium: 'Stadium C' });
+        const team2 = new Team({ name: 'Team D', city: 'City D', stadium: 'Stadium D' });
 
         teamId1 = (await team1.save())._id;
         teamId2 = (await team2.save())._id;
@@ -37,19 +39,19 @@ describe('Admin Fixture Controller', () => {
 
     test('should create a new fixture', async () => {
         const response = await request(app)
-            .post('/admin/fixtures/create') // Actual route
+            .post('/admin/fixtures/create') // Update to your actual route
             .set('Authorization', `Bearer ${fakeToken}`)
             .send({ homeTeam: teamId1, awayTeam: teamId2, date: new Date(Date.now() + 10000) }); // Date in future
 
         expect(response.status).toBe(201);
         expect(response.body.message).toBe('Fixture created');
-        expect(response.body.fixture).toHaveProperty('homeTeam', teamId1.toString());
-        expect(response.body.fixture).toHaveProperty('awayTeam', teamId2.toString());
+        expect(response.body.fixture).toHaveProperty('homeTeam', 'Team C');
+        expect(response.body.fixture).toHaveProperty('awayTeam', 'Team D');
     });
 
     test('should return 400 if required fields are missing', async () => {
         const response = await request(app)
-            .post('/admin/fixtures/create') // Actual route
+            .post('/admin/fixtures/create') // Update to your actual route
             .set('Authorization', `Bearer ${fakeToken}`)
             .send({ homeTeam: '', awayTeam: teamId2, date: new Date(Date.now() + 10000) }); // Missing homeTeam
 
@@ -61,7 +63,7 @@ describe('Admin Fixture Controller', () => {
         const nonExistentTeamId = new mongoose.Types.ObjectId(); // Generate a new ObjectId
 
         const response = await request(app)
-            .post('/admin/fixtures/create') // Actual route
+            .post('/admin/fixtures/create') // Update to your actual route
             .set('Authorization', `Bearer ${fakeToken}`)
             .send({ homeTeam: nonExistentTeamId, awayTeam: teamId2, date: new Date(Date.now() + 10000) });
 
@@ -71,14 +73,14 @@ describe('Admin Fixture Controller', () => {
 
     test('should update an existing fixture', async () => {
         const createResponse = await request(app)
-            .post('/admin/fixtures/create') // Actual route
+            .post('/admin/fixtures/create') // Update to your actual route
             .set('Authorization', `Bearer ${fakeToken}`)
             .send({ homeTeam: teamId1, awayTeam: teamId2, date: new Date(Date.now() + 10000) });
 
         const fixtureId = createResponse.body.fixture._id;
 
         const updateResponse = await request(app)
-            .put(`/admin/fixtures/update/${fixtureId}`) // Actual route
+            .put(`/admin/fixtures/update/${fixtureId}`) // Update to your actual route
             .set('Authorization', `Bearer ${fakeToken}`)
             .send({ date: new Date(Date.now() + 20000) }); // New date in future
 
@@ -91,7 +93,7 @@ describe('Admin Fixture Controller', () => {
         const nonExistentId = new mongoose.Types.ObjectId(); // Generate a new ObjectId
 
         const updateResponse = await request(app)
-            .put(`/admin/fixtures/update/${nonExistentId}`) // Actual route
+            .put(`/admin/fixtures/update/${nonExistentId}`) // Update to your actual route
             .set('Authorization', `Bearer ${fakeToken}`)
             .send({ date: new Date(Date.now() + 10000) });
 
@@ -101,14 +103,14 @@ describe('Admin Fixture Controller', () => {
 
     test('should delete an existing fixture', async () => {
         const createResponse = await request(app)
-            .post('/admin/fixtures/create') // Actual route
+            .post('/admin/fixtures/create') // Update to your actual route
             .set('Authorization', `Bearer ${fakeToken}`)
             .send({ homeTeam: teamId1, awayTeam: teamId2, date: new Date(Date.now() + 10000) });
 
         const fixtureId = createResponse.body.fixture._id;
 
         const deleteResponse = await request(app)
-            .delete(`/admin/fixtures/delete/${fixtureId}`) // Actual route
+            .delete(`/admin/fixtures/delete/${fixtureId}`) // Update to your actual route
             .set('Authorization', `Bearer ${fakeToken}`);
 
         expect(deleteResponse.status).toBe(200);
@@ -119,7 +121,7 @@ describe('Admin Fixture Controller', () => {
         const nonExistentId = new mongoose.Types.ObjectId(); // Generate a new ObjectId
 
         const deleteResponse = await request(app)
-            .delete(`/admin/fixtures/delete/${nonExistentId}`) // Actual route
+            .delete(`/admin/fixtures/delete/${nonExistentId}`) // Update to your actual route
             .set('Authorization', `Bearer ${fakeToken}`);
 
         expect(deleteResponse.status).toBe(404);
@@ -128,12 +130,12 @@ describe('Admin Fixture Controller', () => {
 
     test('should retrieve all fixtures', async () => {
         await request(app)
-            .post('/admin/fixtures/create') // Actual route
+            .post('/admin/fixtures/create') // Update to your actual route
             .set('Authorization', `Bearer ${fakeToken}`)
             .send({ homeTeam: teamId1, awayTeam: teamId2, date: new Date(Date.now() + 10000) });
 
         const response = await request(app)
-            .get('/admin/fixtures/all') // Actual route
+            .get('/admin/fixtures/get-fixtures') // Update to your actual route
             .set('Authorization', `Bearer ${fakeToken}`);
 
         expect(response.status).toBe(200);
